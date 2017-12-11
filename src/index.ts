@@ -1,0 +1,1 @@
+export { linkAll } from './actions';

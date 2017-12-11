@@ -1,0 +1,28 @@
+{
+	"name": "package-linker",
+	"version": "0.0.1",
+	"description": "keeps linked modules in a file",
+	"main": "dist/index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Ties Schwertasek",
+	"license": "MIT",
+	"devDependencies": {
+		"@types/chalk": "^2.2.0",
+		"@types/fs-extra": "^4.0.5",
+		"@types/node": "^8.0.57",
+		"commander": "^2.12.2",
+		"typescript": "^2.6.2"
+	},
+	"preferGlobal": true,
+	"bin": {
+		"ppl": "./dist/bin.js",
+		"ppl-ts": "./src/bin.ts"
+	},
+	"dependencies": {
+		"chalk": "^2.3.0",
+		"express": "^4.16.2",
+		"fs-extra": "^4.0.3"
+	}
+}

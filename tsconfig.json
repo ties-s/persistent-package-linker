@@ -1,0 +1,28 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+      "outDir": "dist",
+      "baseUrl": "src",
+      "sourceMap": true,
+      "declaration": true,
+      "moduleResolution": "node",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "module": "commonjs",
+      "target": "es5",
+      "watch": true,
+      "typeRoots": [
+        "node_modules/@types"
+      ],
+      "lib": [
+        "es2016",
+        "dom"
+      ]
+    },
+    "files": [
+      "./src/bin.ts",
+      "./src/hook.ts",
+      "./src/index.ts"
+    ]
+}
+  
