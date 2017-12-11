@@ -1,7 +1,7 @@
 {
 	"name": "persistent-package-linker",
 	"version": "0.0.1",
-	"description": "keeps linked modules in a file",
+	"description": "persistent npm link behaviour",
 	"main": "dist/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
