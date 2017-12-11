@@ -2,9 +2,11 @@
 
 In `npm@>=5` packages linked via `npm link` are lost if `npm install` is called, this package tries to fix that. 
 
+**NOTE:** currently only works with `npm@>=5.0.4` because of a bug in newer npm versions.
+
 ## Installation
 ```bash
-npm install -g persistent-package-linker
+npm install -g ppl
 ```
 
 ## Usage
