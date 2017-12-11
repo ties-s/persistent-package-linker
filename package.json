@@ -1,5 +1,5 @@
 {
-	"name": "package-linker",
+	"name": "persistent-package-linker",
 	"version": "0.0.1",
 	"description": "keeps linked modules in a file",
 	"main": "dist/index.js",

@@ -4,7 +4,7 @@ In `npm@>=5` packages linked via `npm link` are lost if `npm install` is called,
 
 ## Installation
 ```bash
-npm install -g package-linker
+npm install -g persistent-package-linker
 ```
 
 ## Usage
