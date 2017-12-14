@@ -40,7 +40,7 @@ export default class JSONFile<T extends object> {
                     }
                 })
                 .then(
-                    (): Promise<void> => fs.outputJSON(path, data, { spaces: '\t' }),
+                    (): Promise<void> => fs.outputJSON(path, data, { spaces: <any>'\t' }),
                     err => { 
                         console.error(chalk.red(`[error] Error while writing ${this.fileName}`), err);
                         throw err;

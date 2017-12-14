@@ -13,10 +13,8 @@ npm install -g ppl
 ### Link current package
 ```bash
 ppl link 
-# or (these are equivalent)
-npm link
 ```
-same as original `npm link`
+same as original `npm link` (but some internal diffrences)
 
 
 ### Link package

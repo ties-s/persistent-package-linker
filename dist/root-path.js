@@ -14,9 +14,20 @@ var find = function (searchPath, checkFile) {
 //console.log('[root-path] PWD:', process.env.PWD);
 //console.log('[root-path] __dirname', __dirname);
 var pwd = process.env.PWD.split(path.sep);
-exports.packageRoot = pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules' ? Promise.resolve(pwd.slice(0, -2).join(path.sep)) : find(process.env.PWD);
-exports.linkRoot = exports.packageRoot;
-exports.packageRoot.then(function (p) {
+pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules' ? Promise.resolve(pwd.slice(0, -2).join(path.sep)) : find(process.env.PWD);
+var packageRoot;
+exports.packageRoot = packageRoot;
+if (pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules') {
+    exports.packageRoot = packageRoot = Promise.resolve(pwd.slice(0, -2).join(path.sep));
+}
+else if (pwd.length > 2 && pwd[pwd.length - 3] == 'node_modules' && pwd[pwd.length - 2][0] == '@') {
+    exports.packageRoot = packageRoot = Promise.resolve(pwd.slice(0, -3).join(path.sep));
+}
+else {
+    exports.packageRoot = packageRoot = find(process.env.PWD);
+}
+exports.linkRoot = packageRoot;
+packageRoot.then(function (p) {
     //console.log('[root-path] resolved:', p);
     return p;
 });
