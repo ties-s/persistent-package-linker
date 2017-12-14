@@ -1,6 +1,6 @@
 {
 	"name": "persistent-package-linker",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "persistent npm link behaviour",
 	"main": "dist/index.js",
 	"scripts": {
