@@ -3,4 +3,5 @@ export declare const linkPackage: (packageName: any) => Promise<void>;
 export declare const unlinkPackage: (packageName: any) => Promise<void>;
 export declare const linkAll: () => Promise<void>;
 export declare const linkSelf: () => void;
+export declare const setupLinking: () => Promise<void>;
 export declare const setupHook: () => Promise<void>;

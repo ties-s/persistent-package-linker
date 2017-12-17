@@ -25,6 +25,6 @@ program
     .action(actions_1.unlinkPackage);
 program
     .command('setup')
-    .action(actions_1.setupHook);
+    .action(actions_1.setupLinking);
 program.parse(process.argv);
 //# sourceMappingURL=bin.js.map

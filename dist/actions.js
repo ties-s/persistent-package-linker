@@ -171,6 +171,25 @@ var verifyHook = function (logAll) {
         }
     });
 };
+exports.setupLinking = function () {
+    return execPromise('npm root -g')
+        .then(function (res) {
+        if (res.err)
+            log.warning('Warning while getting npm root path: \n' + res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
+        log.info('Got npm root path:', res.out);
+        return res.out;
+    }, function (err) { log.error('Error while getting npm root path: \n', err); })
+        .then(function (path) { return execPromise('npm install ties-s/lifecycle -S', {
+        cwd: path + "/npm"
+    }); })
+        .then(function (res) {
+        if (res.err)
+            log.warning('Warning while installing patched lifecycle package: \n' + res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
+        log.success('Installed patched lifecycle package:\n' + res.out.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
+    }, function (err) { log.error('Error while installing patched lifecycle package: \n', err); })
+        .then(function (message) { log.success('Done!'); })
+        .catch(function (err) { log.error('Unexpected error', err); });
+};
 exports.setupHook = function () {
     return verifyHook(true);
 };
