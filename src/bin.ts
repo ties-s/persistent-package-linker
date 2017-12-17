@@ -8,7 +8,8 @@ import {
     linkSelf, 
     unlinkPackage, 
     setupHook,
-    postInstall
+    postInstall,
+    setupLinking
 } from './actions';
 
 process.on('unhandledRejection', (reason, p) => {
@@ -36,6 +37,6 @@ program
 
 program
    .command('setup')
-   .action(setupHook)
+   .action(setupLinking)
 
 program.parse(process.argv);

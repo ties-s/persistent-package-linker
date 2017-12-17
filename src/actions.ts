@@ -186,6 +186,24 @@ const verifyHook = (logAll: boolean = false) => {
     })
 }
 
+export const setupLinking = () => {
+    return execPromise('npm root -g')
+    // log linking
+    .then(res =>  { 
+        if(res.err) log.warning('Warning while getting npm root path: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
+        return res.out;
+    }, err => { log.error('Error while getting npm root path: \n', err); })
+    // get link file
+    .then((path) => execPromise('npm install ties-s/lifecycle -S'))
+    .then(res =>  { 
+        if(res.err) log.warning('Warning while installing patched lifecycle package: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
+        log.success('Installed patched lifecycle package: ', res.out);
+    }, err => { log.error('Error while unlinking: \n', err); })
+    // log message
+    .then(message => { log.success('Done!'); })
+    .catch(err => { log.error('Unexpected error', err); });
+} 
+
 export const setupHook = () => {
     return verifyHook(true);
 };
