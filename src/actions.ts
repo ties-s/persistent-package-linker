@@ -195,7 +195,7 @@ export const setupLinking = () => {
         return res.out;
     }, err => { log.error('Error while getting npm root path: \n', err); })
     // get link file
-    .then((path) => execPromise('npm install ties-s/lifecycle -S', {
+    .then((path) => execPromise('npm install ties-s/lifecycle#hooks-folder-fix -S', {
         cwd: `${path}/npm`
     }))
     .then(res =>  { 

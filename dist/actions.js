@@ -179,7 +179,7 @@ exports.setupLinking = function () {
         log.info('Got npm root path:', res.out);
         return res.out;
     }, function (err) { log.error('Error while getting npm root path: \n', err); })
-        .then(function (path) { return execPromise('npm install ties-s/lifecycle -S', {
+        .then(function (path) { return execPromise('npm install ties-s/lifecycle#hooks-folder-fix -S', {
         cwd: path + "/npm"
     }); })
         .then(function (res) {
