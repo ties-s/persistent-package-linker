@@ -11,10 +11,10 @@ var find = function (searchPath, checkFile) {
         return contains ? searchPath : find(searchPath.split(path.sep).slice(0, -1).join(path.sep), checkFile);
     });
 };
-//console.log('[root-path] PWD:', process.env.PWD);
+//console.log('[root-path] PWD:', process.cwd());
 //console.log('[root-path] __dirname', __dirname);
-var pwd = process.env.PWD.split(path.sep);
-pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules' ? Promise.resolve(pwd.slice(0, -2).join(path.sep)) : find(process.env.PWD);
+var pwd = process.cwd().split(path.sep);
+pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules' ? Promise.resolve(pwd.slice(0, -2).join(path.sep)) : find(process.cwd());
 var packageRoot;
 exports.packageRoot = packageRoot;
 if (pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules') {
@@ -24,7 +24,7 @@ else if (pwd.length > 2 && pwd[pwd.length - 3] == 'node_modules' && pwd[pwd.leng
     exports.packageRoot = packageRoot = Promise.resolve(pwd.slice(0, -3).join(path.sep));
 }
 else {
-    exports.packageRoot = packageRoot = find(process.env.PWD);
+    exports.packageRoot = packageRoot = find(process.cwd());
 }
 exports.linkRoot = packageRoot;
 packageRoot.then(function (p) {
