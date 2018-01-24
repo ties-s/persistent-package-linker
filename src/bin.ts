@@ -2,11 +2,11 @@
 'use strict';
 
 import * as program from 'commander';
-import { 
-    linkAll, 
-    linkPackage, 
-    linkSelf, 
-    unlinkPackage, 
+import {
+    linkAll,
+    linkPackage,
+    linkSelf,
+    unlinkPackage,
     setupHook,
     postInstall,
     setupLinking
@@ -17,10 +17,11 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 program
-   .command('link [package]')
-   .action(packageName => {
-       if(packageName)  linkPackage(packageName);
-       else             linkSelf();
+   .command('link [packages...]')
+   .action(packages => {
+	   console.log(packages);
+	   if(packages.length)  linkPackage(packages);
+       else             	linkSelf();
    })
 
 program

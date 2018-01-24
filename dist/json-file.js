@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var root_path_1 = require("./root-path");
 var fs = require("fs-extra");
 var chalk_1 = require("chalk");
-var JSONFile = (function () {
+var JSONFile = /** @class */ (function () {
     function JSONFile(fileName, defaultValue) {
         var _this = this;
         this.fileName = fileName;

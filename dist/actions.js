@@ -48,24 +48,36 @@ var log = {
         for (var _i = 0; _i < arguments.length; _i++) {
             args[_i] = arguments[_i];
         }
-        console.log.apply(console, ['[INFO]'].concat(args).map(function (e) { return typeof e === 'string' ? chalk_1.default.blue(e) : e; }));
+        console.log.apply(console, ['[INFO]'].concat(args).map(function (e) { return typeof e === 'string' ? chalk_1.default.blueBright(e) : e; }));
     }
 };
 exports.postInstall = function () {
 };
-exports.linkPackage = function (packageName) {
-    log.info("Linking package '" + packageName + "'");
+exports.linkPackage = function (packages) {
+    log.info("Linking package(s): '" + packages.join("' '") + "'");
     return verifyHook(true)
-        .then(function () { return execPromise("npm link " + packageName + " --ignore-scripts"); })
+        .then(function () { return execPromise("npm link " + packages.join(' ') + " --ignore-scripts"); })
         .then(function (res) {
         if (res.err)
-            log.warning('[WARN] Warning while linking: \n', res.err);
-        log.success('Linked package: ', res.out.trim());
-    }, function (err) { log.error('Error while linking: \n', err); })
+            log.warning('(npm link) Warning while linking: \n', res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
+        log.success('(npm link) Linked package(s): \n=> ' + res.out.trim().replace('\n', '\n=> '));
+    }, function (err) { log.error('(npm link) Error while linking: \n', err); })
         .then(function () { return linkFile.get(); })
-        .then(function (data) { return data.links.includes(packageName) ? null : { isLinked: data.isLinked, links: data.links.concat(packageName) }; })
-        .then(function (data) { return data ? linkFile.write(data, true).then(function () { return true; }) : false; })
-        .then(function (changed) { return changed === false ? log.info("Package '" + packageName + "' was already in package-links.json") : log.success("Package '" + packageName + "' added to package-links.json"); })
+        .then(function (data) {
+        var notInFile = packages.filter(function (p) { return !data.links.includes(p); });
+        // return notInFile.length ? { isLinked: data.isLinked, links: data.links.concat(notInFile)} : null;
+        if (notInFile.length) {
+            var write = { isLinked: data.isLinked, links: data.links.concat(notInFile) };
+            return linkFile.write(write, true).then(function () {
+                var diff = packages.length - notInFile.length;
+                log.info("(ppl link file) Added " + notInFile.length + " packages to package-links.json"
+                    + (diff > 0 ? ", " + diff + " were already in package-links.json" : ''));
+            });
+        }
+        else {
+            log.info("(ppl link file) " + packages.length + " of " + packages.length + " were already in package-links.json");
+        }
+    })
         .then(function (message) { log.success('Done!'); })
         .catch(function (err) { log.error('Unexpected error', err); });
 };
@@ -161,12 +173,12 @@ var verifyHook = function (logAll) {
     return checkHook().then(function (created) {
         if (created) {
             if (logAll)
-                log.info('Hook already in place');
+                log.info('(ppl hook) Hook already in place');
             return null;
         }
         else {
             return createHook().then(function () {
-                log.success('Hook created');
+                log.success('(ppl hook) Hook created');
             });
         }
     });

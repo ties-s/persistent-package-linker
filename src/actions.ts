@@ -30,7 +30,7 @@ const log = {
         console.log(...['[WARNING]', ...args].map(e => typeof e === 'string' ? chalk.yellow(e) : e))
     },
     info: (...args) => {
-        console.log(...['[INFO]', ...args].map(e => typeof e === 'string' ? chalk.blue(e) : e))
+        console.log(...['[INFO]', ...args].map(e => typeof e === 'string' ? chalk.blueBright(e) : e))
     }
 }
 
@@ -38,36 +38,45 @@ export const postInstall = () => {
 
 }
 
-export const linkPackage = packageName => {
-    log.info(`Linking package '${packageName}'`);
+export const linkPackage = (packages: string[]) => {
+    log.info(`Linking package(s): '${packages.join(`' '`)}'`);
     return verifyHook(true)
-        
-        .then(() => execPromise(`npm link ${packageName} --ignore-scripts`))
+
+        .then(() => execPromise(`npm link ${packages.join(' ')} --ignore-scripts`))
         // log linking
-        .then(res =>  { 
-            if(res.err) log.warning('[WARN] Warning while linking: \n', res.err);
-            log.success('Linked package: ', res.out.trim())
-        }, err => { log.error('Error while linking: \n', err); })
+        .then(res =>  {
+            if(res.err) log.warning('(npm link) Warning while linking: \n', res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
+            log.success('(npm link) Linked package(s): \n=> ' + res.out.trim().replace('\n', '\n=> '))
+        }, err => { log.error('(npm link) Error while linking: \n', err); })
         // get link file
         .then(() => linkFile.get())
         // return data if changed
-        .then(data => data.links.includes(packageName) ? null : { isLinked: data.isLinked, links: data.links.concat(packageName)})
-        // write if data changed
-        .then(data => data ? linkFile.write(data, true).then(() => true) : false)
-        // return message
-        .then(changed => changed === false ? log.info(`Package '${packageName}' was already in package-links.json`) : log.success(`Package '${packageName}' added to package-links.json`))
+        .then(data => {
+			const notInFile = packages.filter(p => !data.links.includes(p))
+			// return notInFile.length ? { isLinked: data.isLinked, links: data.links.concat(notInFile)} : null;
+			if (notInFile.length) {
+				const write = { isLinked: data.isLinked, links: data.links.concat(notInFile)};
+				return linkFile.write(write, true).then(() => {
+					const diff = packages.length - notInFile.length;
+					log.info(`(ppl link file) Added ${notInFile.length} packages to package-links.json`
+						+ (diff > 0 ? `, ${diff} were already in package-links.json` : ''));
+				});
+			} else {
+				log.info(`(ppl link file) ${packages.length} of ${packages.length} were already in package-links.json`);
+			}
+		})
         // log message
         .then(message => { log.success('Done!'); })
         .catch(err => { log.error('Unexpected error', err); });
 
 };
-    
+
 export const unlinkPackage = packageName => {
     log.info(`Unlinking package '${packageName}'`);
     // unlink package
     return execPromise('npm unlink ' + packageName)
         // log linking
-        .then(res =>  { 
+        .then(res =>  {
             if(res.err) log.warning('Warning while unlinking: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
             log.success('Unlinked package: ', res.out);
         }, err => { log.error('Error while unlinking: \n', err); })
@@ -99,24 +108,24 @@ export const linkAll = () => {
         .then(message => { log.success('Done!'); })
         .catch(err => { log.error('Unexpected error', err); });
 };
-    
+
 export const linkSelf = () => {
     log.info('Linking package')
 
     let hadHook = false;
 
     deleteHook()
-        .then(had => { 
+        .then(had => {
             if(had) log.info('Disabling hook');
-            hadHook = had 
+            hadHook = had
         })
         .then(() => execPromise('npm link --ignore-scripts'))
         // log linking
-        .then(res =>  { 
+        .then(res =>  {
             if(res.err) log.warning('Warning while linking: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
             log.success('Linked package:\n' + res.out.split('\n').map(l => `> ${l.trim()}`).join('\n'));
         }, err => { log.error('Error while linking: \n', err); })
-        .then(had => { 
+        .then(had => {
             if(hadHook){
                 log.info('Re-enabling hook');
                 return createHook();
@@ -137,12 +146,12 @@ export const linkSelf = () => {
 };
 
 const hookCodeBash = [
-    '#!/usr/bin/env bash', 
+    '#!/usr/bin/env bash',
     `ppl link-file && echo '[SUCCESS] relinked packages'`
 ].join('\n');
 
 const hookCodeNode = [
-    '#!/usr/bin/env node', 
+    '#!/usr/bin/env node',
     `console.log(process.env)`
 ].join('\n');
 
@@ -176,11 +185,11 @@ const deleteHook = () => {
 const verifyHook = (logAll: boolean = false) => {
     return checkHook().then(created => {
         if(created) {
-            if(logAll) log.info('Hook already in place');
+            if(logAll) log.info('(ppl hook) Hook already in place');
             return null;
         } else {
             return createHook().then(() => {
-                log.success('Hook created');
+                log.success('(ppl hook) Hook created');
             });
         }
     })
@@ -189,7 +198,7 @@ const verifyHook = (logAll: boolean = false) => {
 export const setupLinking = () => {
     return execPromise('npm root -g')
     // log linking
-    .then(res =>  { 
+    .then(res =>  {
         if(res.err) log.warning('Warning while getting npm root path: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
         log.info('Got npm root path:', res.out);
         return res.out;
@@ -198,14 +207,14 @@ export const setupLinking = () => {
     .then((path) => execPromise('npm install ties-s/lifecycle#hooks-folder-fix -S', {
         cwd: `${path}/npm`
     }))
-    .then(res =>  { 
+    .then(res =>  {
         if(res.err) log.warning('Warning while installing patched lifecycle package: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
         log.success('Installed patched lifecycle package:\n' + res.out.split('\n').map(l => `> ${l.trim()}`).join('\n'));
     }, err => { log.error('Error while installing patched lifecycle package: \n', err); })
     // log message
     .then(message => { log.success('Done!'); })
     .catch(err => { log.error('Unexpected error', err); });
-} 
+}
 
 export const setupHook = () => {
     return verifyHook(true);

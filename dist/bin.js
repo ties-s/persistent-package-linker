@@ -7,10 +7,11 @@ process.on('unhandledRejection', function (reason, p) {
     console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 program
-    .command('link [package]')
-    .action(function (packageName) {
-    if (packageName)
-        actions_1.linkPackage(packageName);
+    .command('link [packages...]')
+    .action(function (packages) {
+    console.log(packages);
+    if (packages.length)
+        actions_1.linkPackage(packages);
     else
         actions_1.linkSelf();
 });
