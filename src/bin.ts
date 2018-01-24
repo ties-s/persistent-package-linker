@@ -33,7 +33,7 @@ program
    .action(postInstall)
 
 program
-   .command('unlink <package>')
+   .command('unlink <package...>')
    .action(unlinkPackage)
 
 program

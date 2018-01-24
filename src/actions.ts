@@ -45,7 +45,7 @@ export const linkPackage = (packages: string[]) => {
         .then(() => execPromise(`npm link ${packages.join(' ')} --ignore-scripts`))
         // log linking
         .then(res =>  {
-            if(res.err) log.warning('(npm link) Warning while linking: \n', res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
+            if(res.err) log.warning('(npm link) Warning while linking: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
             log.success('(npm link) Linked package(s): \n=> ' + res.out.trim().replace('\n', '\n=> '))
         }, err => { log.error('(npm link) Error while linking: \n', err); })
         // get link file
@@ -58,7 +58,7 @@ export const linkPackage = (packages: string[]) => {
 				const write = { isLinked: data.isLinked, links: data.links.concat(notInFile)};
 				return linkFile.write(write, true).then(() => {
 					const diff = packages.length - notInFile.length;
-					log.info(`(ppl link file) Added ${notInFile.length} packages to package-links.json`
+					log.info(`(ppl link file) Added ${notInFile.length} package(s) to package-links.json`
 						+ (diff > 0 ? `, ${diff} were already in package-links.json` : ''));
 				});
 			} else {
@@ -71,23 +71,32 @@ export const linkPackage = (packages: string[]) => {
 
 };
 
-export const unlinkPackage = packageName => {
-    log.info(`Unlinking package '${packageName}'`);
+export const unlinkPackage = (packages: string[]) => {
+    log.info(`Unlinking package(s): '${packages.join(`' '`)}'`);
     // unlink package
-    return execPromise('npm unlink ' + packageName)
+    return execPromise(`npm unlink ${packages.join(' ')}`)
         // log linking
         .then(res =>  {
-            if(res.err) log.warning('Warning while unlinking: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
-            log.success('Unlinked package: ', res.out);
+			if(res.err) log.warning('(npm unlink) Warning while unlinking: \n' + res.err.split('\n').map(l => `> ${l.trim()}`).join('\n'));
+            log.success('(npm unlink) Unlinked package(s): \n=> ' + res.out.trim().replace('\n', '\n=> '))
         }, err => { log.error('Error while unlinking: \n', err); })
         // get link file
         .then(() => linkFile.get())
         // return data if changed
-        .then((data: LinkFile): LinkFile => !data.links.includes(packageName) ? null : { isLinked: data.isLinked, links: data.links.filter(l => l != packageName)} )
-        // write if data changed
-        .then((data: LinkFile) => data ? linkFile.write(data, true).then(() => true) : false)
-        // return message
-        .then((changed: boolean): void => changed === false ?  log.info(`Package '${packageName}' already wasn't in package-links.json`): log.success(`Package '${packageName}' removed from package-links.json`))
+        .then((data: LinkFile) => {
+			const inFile = packages.filter(p => data.links.includes(p))
+			// return notInFile.length ? { isLinked: data.isLinked, links: data.links.concat(notInFile)} : null;
+			if (inFile.length) {
+				const write = { isLinked: data.isLinked, links: data.links.filter(l => !inFile.includes(l)) };
+				return linkFile.write(write, true).then(() => {
+					const diff = packages.length - inFile.length;
+					log.info(`(ppl link file) Deleted ${inFile.length} package(s) from package-links.json`
+						+ (diff > 0 ? `, ${diff} were already not in package-links.json` : ''));
+				});
+			} else {
+				log.info(`(ppl link file) ${packages.length} of ${packages.length} were already not in package-links.json`);
+			}
+		})
         // log message
         .then(message => { log.success('Done!'); })
         .catch(err => { log.error('Unexpected error', err); });

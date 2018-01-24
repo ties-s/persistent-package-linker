@@ -22,7 +22,7 @@ program
     .command('post-install')
     .action(actions_1.postInstall);
 program
-    .command('unlink <package>')
+    .command('unlink <package...>')
     .action(actions_1.unlinkPackage);
 program
     .command('setup')

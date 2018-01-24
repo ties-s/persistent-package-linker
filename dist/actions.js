@@ -59,7 +59,7 @@ exports.linkPackage = function (packages) {
         .then(function () { return execPromise("npm link " + packages.join(' ') + " --ignore-scripts"); })
         .then(function (res) {
         if (res.err)
-            log.warning('(npm link) Warning while linking: \n', res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
+            log.warning('(npm link) Warning while linking: \n' + res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
         log.success('(npm link) Linked package(s): \n=> ' + res.out.trim().replace('\n', '\n=> '));
     }, function (err) { log.error('(npm link) Error while linking: \n', err); })
         .then(function () { return linkFile.get(); })
@@ -70,7 +70,7 @@ exports.linkPackage = function (packages) {
             var write = { isLinked: data.isLinked, links: data.links.concat(notInFile) };
             return linkFile.write(write, true).then(function () {
                 var diff = packages.length - notInFile.length;
-                log.info("(ppl link file) Added " + notInFile.length + " packages to package-links.json"
+                log.info("(ppl link file) Added " + notInFile.length + " package(s) to package-links.json"
                     + (diff > 0 ? ", " + diff + " were already in package-links.json" : ''));
             });
         }
@@ -81,19 +81,31 @@ exports.linkPackage = function (packages) {
         .then(function (message) { log.success('Done!'); })
         .catch(function (err) { log.error('Unexpected error', err); });
 };
-exports.unlinkPackage = function (packageName) {
-    log.info("Unlinking package '" + packageName + "'");
+exports.unlinkPackage = function (packages) {
+    log.info("Unlinking package(s): '" + packages.join("' '") + "'");
     // unlink package
-    return execPromise('npm unlink ' + packageName)
+    return execPromise("npm unlink " + packages.join(' '))
         .then(function (res) {
         if (res.err)
-            log.warning('Warning while unlinking: \n' + res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
-        log.success('Unlinked package: ', res.out);
+            log.warning('(npm unlink) Warning while unlinking: \n' + res.err.split('\n').map(function (l) { return "> " + l.trim(); }).join('\n'));
+        log.success('(npm unlink) Unlinked package(s): \n=> ' + res.out.trim().replace('\n', '\n=> '));
     }, function (err) { log.error('Error while unlinking: \n', err); })
         .then(function () { return linkFile.get(); })
-        .then(function (data) { return !data.links.includes(packageName) ? null : { isLinked: data.isLinked, links: data.links.filter(function (l) { return l != packageName; }) }; })
-        .then(function (data) { return data ? linkFile.write(data, true).then(function () { return true; }) : false; })
-        .then(function (changed) { return changed === false ? log.info("Package '" + packageName + "' already wasn't in package-links.json") : log.success("Package '" + packageName + "' removed from package-links.json"); })
+        .then(function (data) {
+        var inFile = packages.filter(function (p) { return data.links.includes(p); });
+        // return notInFile.length ? { isLinked: data.isLinked, links: data.links.concat(notInFile)} : null;
+        if (inFile.length) {
+            var write = { isLinked: data.isLinked, links: data.links.filter(function (l) { return !inFile.includes(l); }) };
+            return linkFile.write(write, true).then(function () {
+                var diff = packages.length - inFile.length;
+                log.info("(ppl link file) Deleted " + inFile.length + " package(s) from package-links.json"
+                    + (diff > 0 ? ", " + diff + " were already not in package-links.json" : ''));
+            });
+        }
+        else {
+            log.info("(ppl link file) " + packages.length + " of " + packages.length + " were already not in package-links.json");
+        }
+    })
         .then(function (message) { log.success('Done!'); })
         .catch(function (err) { log.error('Unexpected error', err); });
 };
