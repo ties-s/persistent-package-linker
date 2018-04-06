@@ -3,7 +3,7 @@
 In `npm@>=5` packages linked via `npm link` are lost if `npm install` is called, this package tries to fix that. 
 
 **NOTE:**
-Doesn't works with `npm@>=5.1 <5.8` because of a bug introduced in `v5.1`, this bug has been fixed in `v5.8.0`. 
+Doesn't work with `npm@>=5.1 <5.8` because of a bug introduced in `v5.1`, this bug has been fixed in `v5.8.0`. 
 
 ## Installation
 ```bash
