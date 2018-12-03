@@ -6,7 +6,7 @@ import { log } from '../log';
 let name = path.resolve('./hook.sh');
 // console.log(__dirname, __filename, name);
 const hookPath = packageRoot.then(root => `${root}/node_modules/.hooks/postinstall`);
-const hookCode = fs.readFile(path.resolve(__dirname, './hook.js'), 'utf8');
+const hookCode = fs.readFile(path.resolve(__dirname, '../hook.sh'), 'utf8');
 
 export async function checkHook(): Promise<boolean> {
     return hookPath.then(async path => {
