@@ -2,15 +2,11 @@
 'use strict';
 
 import * as program from 'commander';
-import {
-    linkAll,
-    linkPackage,
-    linkSelf,
-    unlinkPackage,
-    setupHook,
-    postInstall,
-    setupLinking
-} from './actions';
+import { linkSelf } from './actions/link-self';
+import { linkPackage } from './actions/link-package';
+import { unlinkPackage } from './actions/unlink';
+import { setupLinking } from './actions/setup';
+import { relink } from './actions/relink';
 
 process.on('unhandledRejection', (reason, p) => {
    console.log('Unhandled Rejection at: Promise', p, 'reason:', reason);
@@ -26,11 +22,7 @@ program
 
 program
    .command('link-file')
-   .action(linkAll)
-
-program
-   .command('post-install')
-   .action(postInstall)
+   .action(relink)
 
 program
    .command('unlink <package...>')
