@@ -16,14 +16,20 @@ const find = (searchPath: string, checkFile?: string): Promise<string> => {
 //console.log('[root-path] PWD:', process.cwd());
 //console.log('[root-path] __dirname', __dirname);
 
-const pwd = process.cwd().split(path.sep)
-    pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules' ? Promise.resolve(pwd.slice(0, -2).join(path.sep)) : find(process.cwd());
+const cwd = process.cwd();
+const pwd = cwd.split(path.sep);
 
 var packageRoot: Promise<string>;
 if(pwd.length > 2 && pwd[pwd.length - 2] == 'node_modules'){
-    packageRoot = Promise.resolve(pwd.slice(0, -2).join(path.sep));
+	//                [l-2]        [l-1]
+	// PROJECT_FOLDER/node_modules/package
+	//                ^^^^^^^^^^^^
+	packageRoot = Promise.resolve(pwd.slice(0, -2).join(path.sep));
 } else if(pwd.length > 2 && pwd[pwd.length - 3] == 'node_modules' && pwd[pwd.length - 2][0] == '@'){
-    packageRoot = Promise.resolve(pwd.slice(0, -3).join(path.sep));
+	//                [l-3]        [l-2]  [l-1]
+	// PROJECT_FOLDER/node_modules/@scope/package
+	//                ^^^^^^^^^^^^ ^
+	packageRoot = Promise.resolve(pwd.slice(0, -3).join(path.sep));
 } else {
     packageRoot = find(process.cwd());
 }
@@ -33,6 +39,6 @@ export { packageRoot };
 export const linkRoot       = packageRoot;
 
 packageRoot.then(p => {
-    //console.log('[root-path] resolved:', p);
+    console.log('[root-path] resolved:', p);
     return p;
 })
