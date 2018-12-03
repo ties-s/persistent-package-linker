@@ -5,6 +5,9 @@ In `npm@>=5` packages linked via `npm link` are lost if `npm install` is called,
 **NOTE:**
 Doesn't work with `npm@>=5.1 <5.8` because of a bug introduced in `v5.1`, this bug has been fixed in `v5.8.0`. 
 
+**NOTE:**
+Requires `npm@>=5.4` to work when installing local modules with their file path.
+
 ## Installation
 ```bash
 npm install -g persistent-package-linker
