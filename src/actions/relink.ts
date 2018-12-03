@@ -5,7 +5,7 @@ import * as path from "path";
 
 export async function relink(cwd: string = process.cwd()) {
 	log.info('Re-linking all packages from package-links.json')
-	return linkFile.get()
+	return linkFile.get(cwd)
 		.then(res => res.links.join(' '))
 		.then(res =>  res.length ? execPromise('npm link --ignore-scripts ' + res, { cwd: cwd }) : null)
 		.then(res =>  {
