@@ -1,11 +1,11 @@
 import { log } from "../log";
-import { verifyHook } from "./hook";
+import { verifyHooks } from "./hook";
 import { execPromise } from "../util";
 import { linkFile } from "./paths";
 
 export function linkPackage(packages: string[]) {
     log.info(`Linking package(s): '${packages.join(`' '`)}'`);
-    return verifyHook(true)
+    return verifyHooks(true)
 
         .then(() => execPromise(`npm link ${packages.join(' ')} --ignore-scripts`))
         // log linking
