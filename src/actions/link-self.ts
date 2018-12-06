@@ -1,16 +1,16 @@
 import { log } from "../log";
 import { execPromise } from "../util";
-import { deleteHook, createHook } from "./hook";
+import { createHooks, deleteHooks } from "./hook";
 
 export async function linkSelf() {
     log.info('Linking package')
 
     let hadHook = false;
 
-    deleteHook()
-        .then(had => {
-            if(had) log.info('Disabling hook');
-            hadHook = had
+    deleteHooks()
+        .then(nDelted => {
+            if(nDelted > 0) log.info('Disabling hook');
+            hadHook = nDelted > 0;
         })
         .then(() => execPromise('npm link --ignore-scripts'))
         // log linking
@@ -21,7 +21,7 @@ export async function linkSelf() {
         .then(had => {
             if(hadHook){
                 log.info('Re-enabling hook');
-                return createHook();
+                return createHooks();
             }
         })
         // get link file
